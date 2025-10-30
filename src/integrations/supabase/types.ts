@@ -14,12 +14,42 @@ export type Database = {
   }
   public: {
     Tables: {
+      classes: {
+        Row: {
+          created_at: string
+          created_by: string
+          description: string | null
+          id: string
+          name: string
+          school_year: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          description?: string | null
+          id?: string
+          name: string
+          school_year?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          description?: string | null
+          id?: string
+          name?: string
+          school_year?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       daily_evaluations: {
         Row: {
           audio_url: string | null
           behavior_rating: string | null
           created_at: string
-          created_by: string | null
+          created_by: string
           daily_notes: string | null
           eating_rating: string | null
           evaluation_date: string
@@ -32,7 +62,7 @@ export type Database = {
           audio_url?: string | null
           behavior_rating?: string | null
           created_at?: string
-          created_by?: string | null
+          created_by: string
           daily_notes?: string | null
           eating_rating?: string | null
           evaluation_date?: string
@@ -45,7 +75,7 @@ export type Database = {
           audio_url?: string | null
           behavior_rating?: string | null
           created_at?: string
-          created_by?: string | null
+          created_by?: string
           daily_notes?: string | null
           eating_rating?: string | null
           evaluation_date?: string
@@ -64,27 +94,83 @@ export type Database = {
           },
         ]
       }
+      profiles: {
+        Row: {
+          created_at: string
+          email: string
+          full_name: string | null
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          full_name?: string | null
+          id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          full_name?: string | null
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       students: {
         Row: {
+          class_id: string | null
           class_name: string
           created_at: string
-          created_by: string | null
+          created_by: string
           id: string
           name: string
         }
         Insert: {
+          class_id?: string | null
           class_name: string
           created_at?: string
-          created_by?: string | null
+          created_by: string
           id?: string
           name: string
         }
         Update: {
+          class_id?: string | null
           class_name?: string
           created_at?: string
-          created_by?: string | null
+          created_by?: string
           id?: string
           name?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "students_class_id_fkey"
+            columns: ["class_id"]
+            isOneToOne: false
+            referencedRelation: "classes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
         }
         Relationships: []
       }
@@ -93,10 +179,20 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_user_roles: {
+        Args: { _user_id: string }
+        Returns: Database["public"]["Enums"]["app_role"][]
+      }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "teacher" | "parent"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -223,6 +319,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "teacher", "parent"],
+    },
   },
 } as const
