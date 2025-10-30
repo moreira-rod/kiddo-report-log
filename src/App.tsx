@@ -7,6 +7,7 @@ import Auth from "./pages/Auth";
 import Students from "./pages/Students";
 import Evaluation from "./pages/Evaluation";
 import Timeline from "./pages/Timeline";
+import Classes from "./pages/Classes";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -20,6 +21,7 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Students />} />
           <Route path="/auth" element={<Auth />} />
+          <Route path="/classes" element={<Classes />} />
           <Route path="/evaluation/:studentId" element={<Evaluation />} />
           <Route path="/timeline/:studentId" element={<Timeline />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

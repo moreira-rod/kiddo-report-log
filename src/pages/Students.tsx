@@ -3,8 +3,9 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Plus, LogOut, Users, FileText } from "lucide-react";
+import { Plus, LogOut, Users, FileText, BookOpen } from "lucide-react";
 import { toast } from "sonner";
+import { useAuth } from "@/hooks/useAuth";
 import StudentCard from "@/components/StudentCard";
 import AddStudentDialog from "@/components/AddStudentDialog";
 
@@ -19,18 +20,17 @@ const Students = () => {
   const [loading, setLoading] = useState(true);
   const [showAddDialog, setShowAddDialog] = useState(false);
   const navigate = useNavigate();
+  const { loading: authLoading, user, profile } = useAuth();
 
   useEffect(() => {
-    checkUser();
-    fetchStudents();
-  }, []);
-
-  const checkUser = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-      navigate("/auth");
+    if (!authLoading) {
+      if (!user) {
+        navigate("/auth");
+      } else {
+        fetchStudents();
+      }
     }
-  };
+  }, [authLoading, user, navigate]);
 
   const fetchStudents = async () => {
     try {
@@ -53,6 +53,17 @@ const Students = () => {
     navigate("/auth");
   };
 
+  if (authLoading || loading) {
+    return (
+      <div className="min-h-screen bg-gradient-background flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Carregando...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-background">
       <header className="bg-card shadow-soft sticky top-0 z-10">
@@ -63,12 +74,19 @@ const Students = () => {
             </div>
             <div>
               <h1 className="text-xl font-bold text-foreground">Meus Alunos</h1>
-              <p className="text-sm text-muted-foreground">{students.length} alunos cadastrados</p>
+              <p className="text-sm text-muted-foreground">
+                {profile?.full_name || profile?.email || "Usuário"} • {students.length} alunos
+              </p>
             </div>
           </div>
-          <Button variant="ghost" size="icon" onClick={handleLogout}>
-            <LogOut className="w-5 h-5" />
-          </Button>
+          <div className="flex gap-2">
+            <Button variant="ghost" size="icon" onClick={() => navigate("/classes")}>
+              <BookOpen className="w-5 h-5" />
+            </Button>
+            <Button variant="ghost" size="icon" onClick={handleLogout}>
+              <LogOut className="w-5 h-5" />
+            </Button>
+          </div>
         </div>
       </header>
 
