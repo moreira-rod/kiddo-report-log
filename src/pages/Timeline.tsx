@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ArrowLeft, Calendar } from "lucide-react";
 import { toast } from "sonner";
+import { useAuth } from "@/hooks/useAuth";
 import TimelineItem from "@/components/TimelineItem";
 
 interface Student {
@@ -27,13 +28,21 @@ interface Evaluation {
 const Timeline = () => {
   const { studentId } = useParams();
   const navigate = useNavigate();
+  const { loading: authLoading, isTeacher, isAdmin } = useAuth();
   const [student, setStudent] = useState<Student | null>(null);
   const [evaluations, setEvaluations] = useState<Evaluation[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchData();
-  }, [studentId]);
+    if (!authLoading) {
+      if (!isTeacher && !isAdmin) {
+        toast.error("Acesso negado");
+        navigate("/");
+      } else {
+        fetchData();
+      }
+    }
+  }, [studentId, authLoading, isTeacher, isAdmin]);
 
   const fetchData = async () => {
     try {
@@ -59,10 +68,13 @@ const Timeline = () => {
     }
   };
 
-  if (loading) {
+  if (authLoading || loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      <div className="min-h-screen bg-gradient-background flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Carregando...</p>
+        </div>
       </div>
     );
   }

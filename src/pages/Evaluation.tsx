@@ -5,8 +5,9 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowLeft, Save, Mic, StopCircle } from "lucide-react";
+import { ArrowLeft, Save } from "lucide-react";
 import { toast } from "sonner";
+import { useAuth } from "@/hooks/useAuth";
 import EvaluationOption from "@/components/EvaluationOption";
 import AudioRecorder from "@/components/AudioRecorder";
 
@@ -19,6 +20,7 @@ interface Student {
 const Evaluation = () => {
   const { studentId } = useParams();
   const navigate = useNavigate();
+  const { loading: authLoading, isTeacher, isAdmin } = useAuth();
   const [student, setStudent] = useState<Student | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -31,9 +33,16 @@ const Evaluation = () => {
   const [audioUrl, setAudioUrl] = useState("");
 
   useEffect(() => {
-    fetchStudent();
-    fetchTodayEvaluation();
-  }, [studentId]);
+    if (!authLoading) {
+      if (!isTeacher && !isAdmin) {
+        toast.error("Acesso negado");
+        navigate("/");
+      } else {
+        fetchStudent();
+        fetchTodayEvaluation();
+      }
+    }
+  }, [studentId, authLoading, isTeacher, isAdmin]);
 
   const fetchStudent = async () => {
     try {
@@ -113,10 +122,13 @@ const Evaluation = () => {
     }
   };
 
-  if (loading) {
+  if (authLoading || loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      <div className="min-h-screen bg-gradient-background flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Carregando...</p>
+        </div>
       </div>
     );
   }
