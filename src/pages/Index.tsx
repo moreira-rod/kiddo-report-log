@@ -2,14 +2,14 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { BookOpen, Users, LogOut, GraduationCap } from "lucide-react";
+import { BookOpen, Users, LogOut, GraduationCap, BarChart, Heart } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
 
 const Index = () => {
   const navigate = useNavigate();
-  const { loading, user, profile, isTeacher, isAdmin } = useAuth();
+  const { loading, user, profile, isTeacher, isParent, canManage } = useAuth();
 
   useEffect(() => {
     if (!loading && !user) {
@@ -64,24 +64,24 @@ const Index = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {(isTeacher || isAdmin) && (
-            <>
-              <Card className="p-6 shadow-card hover:shadow-soft transition-smooth cursor-pointer" onClick={() => navigate("/students")}>
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 rounded-full bg-gradient-secondary flex items-center justify-center flex-shrink-0">
-                    <Users className="w-6 h-6 text-white" />
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="font-semibold text-lg text-foreground mb-2">Alunos</h3>
-                    <p className="text-sm text-muted-foreground mb-4">
-                      Visualize e gerencie seus alunos, faça avaliações diárias e acompanhe o histórico
-                    </p>
-                    <Button className="w-full">Acessar Alunos</Button>
-                  </div>
-                </div>
-              </Card>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <Card className="p-6 shadow-card hover:shadow-soft transition-smooth cursor-pointer" onClick={() => navigate("/")}>
+            <div className="flex items-start gap-4">
+              <div className="w-12 h-12 rounded-full bg-gradient-secondary flex items-center justify-center flex-shrink-0">
+                <Users className="w-6 h-6 text-white" />
+              </div>
+              <div className="flex-1">
+                <h3 className="font-semibold text-lg text-foreground mb-2">Alunos</h3>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Visualize e gerencie seus alunos, faça avaliações diárias
+                </p>
+                <Button className="w-full">Acessar Alunos</Button>
+              </div>
+            </div>
+          </Card>
 
+          {(isTeacher || canManage) && (
+            <>
               <Card className="p-6 shadow-card hover:shadow-soft transition-smooth cursor-pointer" onClick={() => navigate("/classes")}>
                 <div className="flex items-start gap-4">
                   <div className="w-12 h-12 rounded-full bg-gradient-accent flex items-center justify-center flex-shrink-0">
@@ -90,13 +90,64 @@ const Index = () => {
                   <div className="flex-1">
                     <h3 className="font-semibold text-lg text-foreground mb-2">Turmas</h3>
                     <p className="text-sm text-muted-foreground mb-4">
-                      Organize seus alunos em turmas e gerencie as informações de cada grupo
+                      Organize seus alunos em turmas
                     </p>
                     <Button className="w-full">Acessar Turmas</Button>
                   </div>
                 </div>
               </Card>
+
+              {isTeacher && (
+                <Card className="p-6 shadow-card hover:shadow-soft transition-smooth cursor-pointer" onClick={() => navigate("/teacher-dashboard")}>
+                  <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 rounded-full bg-blue-500/20 flex items-center justify-center flex-shrink-0">
+                      <BarChart className="w-6 h-6 text-blue-600" />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-lg text-foreground mb-2">Dashboard Professor</h3>
+                      <p className="text-sm text-muted-foreground mb-4">
+                        Estatísticas e insights dos seus alunos
+                      </p>
+                      <Button className="w-full">Ver Dashboard</Button>
+                    </div>
+                  </div>
+                </Card>
+              )}
+
+              {canManage && (
+                <Card className="p-6 shadow-card hover:shadow-soft transition-smooth cursor-pointer" onClick={() => navigate("/management-dashboard")}>
+                  <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 rounded-full bg-purple-500/20 flex items-center justify-center flex-shrink-0">
+                      <BarChart className="w-6 h-6 text-purple-600" />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-lg text-foreground mb-2">Dashboard Gestão</h3>
+                      <p className="text-sm text-muted-foreground mb-4">
+                        Visão geral completa da escola
+                      </p>
+                      <Button className="w-full">Ver Dashboard</Button>
+                    </div>
+                  </div>
+                </Card>
+              )}
             </>
+          )}
+
+          {isParent && (
+            <Card className="p-6 shadow-card hover:shadow-soft transition-smooth cursor-pointer" onClick={() => navigate("/parent-dashboard")}>
+              <div className="flex items-start gap-4">
+                <div className="w-12 h-12 rounded-full bg-pink-500/20 flex items-center justify-center flex-shrink-0">
+                  <Heart className="w-6 h-6 text-pink-600" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-semibold text-lg text-foreground mb-2">Meus Filhos</h3>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Acompanhe o desenvolvimento dos seus filhos
+                  </p>
+                  <Button className="w-full">Acessar Área dos Pais</Button>
+                </div>
+              </div>
+            </Card>
           )}
         </div>
       </main>

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { User, Session } from "@supabase/supabase-js";
 
-type AppRole = "admin" | "teacher" | "parent";
+type AppRole = "admin" | "teacher" | "parent" | "director" | "coordinator";
 
 interface Profile {
   id: string;
@@ -84,6 +84,11 @@ export const useAuth = () => {
   const isAdmin = hasRole("admin");
   const isTeacher = hasRole("teacher");
   const isParent = hasRole("parent");
+  const isDirector = hasRole("director");
+  const isCoordinator = hasRole("coordinator");
+  
+  // Helper to check if user can manage (admin, director, or coordinator)
+  const canManage = isAdmin || isDirector || isCoordinator;
 
   return {
     user,
@@ -95,5 +100,8 @@ export const useAuth = () => {
     isAdmin,
     isTeacher,
     isParent,
+    isDirector,
+    isCoordinator,
+    canManage,
   };
 };

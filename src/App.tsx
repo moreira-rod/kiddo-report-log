@@ -8,6 +8,9 @@ import Students from "./pages/Students";
 import Evaluation from "./pages/Evaluation";
 import Timeline from "./pages/Timeline";
 import Classes from "./pages/Classes";
+import ParentDashboard from "./pages/ParentDashboard";
+import TeacherDashboard from "./pages/TeacherDashboard";
+import ManagementDashboard from "./pages/ManagementDashboard";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -24,6 +27,9 @@ const App = () => (
           <Route path="/classes" element={<Classes />} />
           <Route path="/evaluation/:studentId" element={<Evaluation />} />
           <Route path="/timeline/:studentId" element={<Timeline />} />
+          <Route path="/parent-dashboard" element={<ParentDashboard />} />
+          <Route path="/teacher-dashboard" element={<TeacherDashboard />} />
+          <Route path="/management-dashboard" element={<ManagementDashboard />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

@@ -20,7 +20,7 @@ const Students = () => {
   const [loading, setLoading] = useState(true);
   const [showAddDialog, setShowAddDialog] = useState(false);
   const navigate = useNavigate();
-  const { loading: authLoading, user, profile } = useAuth();
+  const { loading: authLoading, user, profile, canManage } = useAuth();
 
   useEffect(() => {
     if (!authLoading) {
@@ -121,15 +121,25 @@ const Students = () => {
                 />
               ))}
             </div>
-            
-            <Button
-              onClick={() => setShowAddDialog(true)}
-              size="lg"
-              className="fixed bottom-6 right-6 shadow-soft h-14 w-14 rounded-full p-0"
-            >
-              <Plus className="w-6 h-6" />
-            </Button>
           </>
+        )}
+
+        {canManage ? (
+          <Button
+            onClick={() => setShowAddDialog(true)}
+            size="lg"
+            className="fixed bottom-6 right-6 shadow-soft h-14 w-14 rounded-full p-0"
+          >
+            <Plus className="w-6 h-6" />
+          </Button>
+        ) : (
+          students.length > 0 && (
+            <div className="fixed bottom-6 right-6 p-4 bg-accent rounded-lg shadow-lg max-w-xs">
+              <p className="text-sm text-muted-foreground">
+                💡 Apenas gestores podem adicionar novos alunos
+              </p>
+            </div>
+          )
         )}
       </main>
 
