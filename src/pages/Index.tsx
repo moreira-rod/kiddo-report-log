@@ -2,14 +2,14 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { BookOpen, Users, LogOut, GraduationCap, BarChart, Heart } from "lucide-react";
+import { BookOpen, Users, LogOut, GraduationCap, BarChart, Heart, Shield } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
 
 const Index = () => {
   const navigate = useNavigate();
-  const { loading, user, profile, isTeacher, isParent, canManage } = useAuth();
+  const { loading, user, profile, isTeacher, isParent, canManage, isAdmin } = useAuth();
 
   useEffect(() => {
     if (!loading && !user) {
@@ -126,6 +126,23 @@ const Index = () => {
                         Visão geral completa da escola
                       </p>
                       <Button className="w-full">Ver Dashboard</Button>
+                    </div>
+                  </div>
+                </Card>
+              )}
+
+              {isAdmin && (
+                <Card className="p-6 shadow-card hover:shadow-soft transition-smooth cursor-pointer" onClick={() => navigate("/admin")}>
+                  <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 rounded-full bg-red-500/20 flex items-center justify-center flex-shrink-0">
+                      <Shield className="w-6 h-6 text-red-600" />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-lg text-foreground mb-2">Console Admin</h3>
+                      <p className="text-sm text-muted-foreground mb-4">
+                        Gerenciar usuários e permissões
+                      </p>
+                      <Button className="w-full">Acessar Console</Button>
                     </div>
                   </div>
                 </Card>
