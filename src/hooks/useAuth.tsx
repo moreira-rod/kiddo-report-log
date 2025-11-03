@@ -62,6 +62,7 @@ export const useAuth = () => {
         .maybeSingle();
 
       if (profileError) throw profileError;
+      console.log("Profile loaded:", profileData);
       setProfile(profileData);
 
       // Fetch roles
@@ -71,6 +72,7 @@ export const useAuth = () => {
         .eq("user_id", userId);
 
       if (rolesError) throw rolesError;
+      console.log("Roles loaded:", rolesData);
       setRoles(rolesData?.map((r) => r.role as AppRole) || []);
     } catch (error) {
       console.error("Error fetching profile and roles:", error);
