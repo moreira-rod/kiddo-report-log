@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Plus, LogOut, Users, FileText, BookOpen } from "lucide-react";
+import { Plus, LogOut, Users, FileText, BookOpen, Shield } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
 import StudentCard from "@/components/StudentCard";
@@ -20,7 +20,7 @@ const Students = () => {
   const [loading, setLoading] = useState(true);
   const [showAddDialog, setShowAddDialog] = useState(false);
   const navigate = useNavigate();
-  const { loading: authLoading, user, profile, canManage } = useAuth();
+  const { loading: authLoading, user, profile, canManage, isAdmin } = useAuth();
 
   useEffect(() => {
     if (!authLoading) {
@@ -80,6 +80,16 @@ const Students = () => {
             </div>
           </div>
           <div className="flex gap-2">
+            {isAdmin && (
+              <Button
+                variant="outline"
+                onClick={() => navigate("/admin")}
+                className="hidden sm:inline-flex"
+              >
+                <Shield className="w-4 h-4 mr-2" />
+                Admin
+              </Button>
+            )}
             <Button variant="ghost" size="icon" onClick={() => navigate("/classes")}>
               <BookOpen className="w-5 h-5" />
             </Button>
