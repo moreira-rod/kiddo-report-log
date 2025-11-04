@@ -11,8 +11,8 @@ interface ClassCardProps {
     school_year: string | null;
   };
   studentCount: number;
-  onEdit: () => void;
-  onDelete: () => void;
+  onEdit?: () => void;
+  onDelete?: () => void;
 }
 
 const ClassCard = ({ classData, studentCount, onEdit, onDelete }: ClassCardProps) => {
@@ -39,16 +39,22 @@ const ClassCard = ({ classData, studentCount, onEdit, onDelete }: ClassCardProps
         </div>
       </div>
 
-      <div className="mt-6 flex gap-2">
-        <Button onClick={onEdit} variant="outline" size="sm" className="gap-2">
-          <Pencil className="w-3 h-3" />
-          Editar
-        </Button>
-        <Button onClick={onDelete} variant="outline" size="sm" className="gap-2">
-          <Trash2 className="w-3 h-3" />
-          Excluir
-        </Button>
-      </div>
+      {(onEdit || onDelete) && (
+        <div className="mt-6 flex gap-2">
+          {onEdit && (
+            <Button onClick={onEdit} variant="outline" size="sm" className="gap-2">
+              <Pencil className="w-3 h-3" />
+              Editar
+            </Button>
+          )}
+          {onDelete && (
+            <Button onClick={onDelete} variant="outline" size="sm" className="gap-2">
+              <Trash2 className="w-3 h-3" />
+              Excluir
+            </Button>
+          )}
+        </div>
+      )}
     </Card>
   );
 };

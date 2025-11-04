@@ -20,6 +20,7 @@ export type Database = {
           created_by: string
           description: string | null
           id: string
+          managed_by: string | null
           name: string
           school_year: string | null
           updated_at: string
@@ -29,6 +30,7 @@ export type Database = {
           created_by: string
           description?: string | null
           id?: string
+          managed_by?: string | null
           name: string
           school_year?: string | null
           updated_at?: string
@@ -38,11 +40,20 @@ export type Database = {
           created_by?: string
           description?: string | null
           id?: string
+          managed_by?: string | null
           name?: string
           school_year?: string | null
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "classes_managed_by_fkey"
+            columns: ["managed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       daily_evaluations: {
         Row: {
@@ -132,6 +143,7 @@ export type Database = {
           email: string
           full_name: string | null
           id: string
+          managed_by: string | null
           updated_at: string
         }
         Insert: {
@@ -139,6 +151,7 @@ export type Database = {
           email: string
           full_name?: string | null
           id: string
+          managed_by?: string | null
           updated_at?: string
         }
         Update: {
@@ -146,9 +159,18 @@ export type Database = {
           email?: string
           full_name?: string | null
           id?: string
+          managed_by?: string | null
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "profiles_managed_by_fkey"
+            columns: ["managed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       students: {
         Row: {
@@ -224,7 +246,13 @@ export type Database = {
       }
     }
     Enums: {
-      app_role: "admin" | "teacher" | "parent" | "director" | "coordinator"
+      app_role:
+        | "admin"
+        | "teacher"
+        | "parent"
+        | "director"
+        | "coordinator"
+        | "student"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -352,7 +380,14 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin", "teacher", "parent", "director", "coordinator"],
+      app_role: [
+        "admin",
+        "teacher",
+        "parent",
+        "director",
+        "coordinator",
+        "student",
+      ],
     },
   },
 } as const

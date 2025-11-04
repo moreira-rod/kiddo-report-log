@@ -34,18 +34,17 @@ const Classes = () => {
   const [classToDelete, setClassToDelete] = useState<string | null>(null);
   const [studentCounts, setStudentCounts] = useState<Record<string, number>>({});
   const navigate = useNavigate();
-  const { loading: authLoading, isTeacher, isAdmin } = useAuth();
+  const { loading: authLoading, user, profile, isTeacher, isAdmin, isParent, canManage, isDirector, isCoordinator } = useAuth();
 
   useEffect(() => {
     if (!authLoading) {
-      if (!isTeacher && !isAdmin) {
-        toast.error("Acesso negado");
-        navigate("/");
+      if (!user) {
+        navigate("/auth");
       } else {
         fetchClasses();
       }
     }
-  }, [authLoading, isTeacher, isAdmin, navigate]);
+  }, [authLoading, user, navigate]);
 
   const fetchClasses = async () => {
     try {
@@ -128,7 +127,9 @@ const Classes = () => {
             </div>
             <div>
               <h1 className="text-xl font-bold text-foreground">Turmas</h1>
-              <p className="text-sm text-muted-foreground">{classes.length} turmas cadastradas</p>
+              <p className="text-sm text-muted-foreground">
+                {profile?.full_name || profile?.email || "Usuário"} • {classes.length} turmas
+              </p>
             </div>
           </div>
           <Button variant="ghost" size="icon" onClick={handleLogout}>
@@ -141,14 +142,20 @@ const Classes = () => {
         {classes.length === 0 ? (
           <Card className="p-12 text-center shadow-card">
             <BookOpen className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
-            <h2 className="text-2xl font-bold mb-2">Nenhuma turma cadastrada</h2>
+            <h2 className="text-2xl font-bold mb-2">
+              {canManage ? "Nenhuma turma cadastrada" : "Nenhuma turma disponível"}
+            </h2>
             <p className="text-muted-foreground mb-6">
-              Crie sua primeira turma para organizar seus alunos
+              {canManage 
+                ? "Crie sua primeira turma para organizar seus alunos"
+                : "Você não tem filhos matriculados em turmas no momento"}
             </p>
-            <Button onClick={() => setShowAddDialog(true)} className="gap-2">
-              <Plus className="w-4 h-4" />
-              Adicionar Primeira Turma
-            </Button>
+            {canManage && (
+              <Button onClick={() => setShowAddDialog(true)} className="gap-2">
+                <Plus className="w-4 h-4" />
+                Adicionar Primeira Turma
+              </Button>
+            )}
           </Card>
         ) : (
           <>
@@ -158,25 +165,32 @@ const Classes = () => {
                   key={cls.id}
                   classData={cls}
                   studentCount={studentCounts[cls.id] || 0}
-                  onEdit={() => {
-                    // TODO: Implement edit functionality
+                  onEdit={canManage ? () => {
                     toast.info("Funcionalidade em desenvolvimento");
-                  }}
-                  onDelete={() => {
+                  } : undefined}
+                  onDelete={canManage ? () => {
                     setClassToDelete(cls.id);
                     setDeleteDialogOpen(true);
-                  }}
+                  } : undefined}
                 />
               ))}
             </div>
             
-            <Button
-              onClick={() => setShowAddDialog(true)}
-              size="lg"
-              className="fixed bottom-6 right-6 shadow-soft h-14 w-14 rounded-full p-0"
-            >
-              <Plus className="w-6 h-6" />
-            </Button>
+            {canManage ? (
+              <Button
+                onClick={() => setShowAddDialog(true)}
+                size="lg"
+                className="fixed bottom-6 right-6 shadow-soft h-14 w-14 rounded-full p-0"
+              >
+                <Plus className="w-6 h-6" />
+              </Button>
+            ) : (
+              <div className="fixed bottom-6 right-6 p-4 bg-card rounded-lg shadow-soft max-w-xs border">
+                <p className="text-sm text-muted-foreground">
+                  💡 Turmas dos seus filhos matriculados na escola
+                </p>
+              </div>
+            )}
           </>
         )}
       </main>

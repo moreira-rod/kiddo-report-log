@@ -34,7 +34,7 @@ interface UserData {
   roles: string[];
 }
 
-const AVAILABLE_ROLES = ["admin", "teacher", "parent", "director", "coordinator"];
+const AVAILABLE_ROLES = ["admin", "teacher", "parent", "director", "coordinator", "student"];
 
 const AdminConsole = () => {
   const navigate = useNavigate();
