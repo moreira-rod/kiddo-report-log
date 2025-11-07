@@ -24,6 +24,13 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { ArrowLeft, Plus, Trash2, Edit, Shield } from "lucide-react";
 import { toast } from "sonner";
 
@@ -49,6 +56,7 @@ const AdminConsole = () => {
   const [newEmail, setNewEmail] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [newFullName, setNewFullName] = useState("");
+  const [newRole, setNewRole] = useState("parent");
   
   // Edit roles form
   const [editRoles, setEditRoles] = useState<string[]>([]);
@@ -153,6 +161,7 @@ const AdminConsole = () => {
           email: newEmail,
           password: newPassword,
           full_name: newFullName,
+          role: newRole,
         },
       });
 
@@ -163,6 +172,7 @@ const AdminConsole = () => {
       setNewEmail("");
       setNewPassword("");
       setNewFullName("");
+      setNewRole("parent");
       fetchUsers();
     } catch (error: any) {
       console.error("Error:", error);
@@ -261,7 +271,7 @@ const AdminConsole = () => {
               <DialogHeader>
                 <DialogTitle>Criar Novo Usuário</DialogTitle>
                 <DialogDescription>
-                  Crie um novo usuário no sistema. Por padrão, novos usuários receberão a role "teacher".
+                  Crie um novo usuário no sistema e escolha sua permissão inicial.
                 </DialogDescription>
               </DialogHeader>
               <div className="space-y-4">
@@ -293,6 +303,21 @@ const AdminConsole = () => {
                     onChange={(e) => setNewFullName(e.target.value)}
                     placeholder="Nome completo"
                   />
+                </div>
+                <div>
+                  <Label htmlFor="role">Permissão Inicial</Label>
+                  <Select value={newRole} onValueChange={setNewRole}>
+                    <SelectTrigger id="role">
+                      <SelectValue placeholder="Selecione uma permissão" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {AVAILABLE_ROLES.map((role) => (
+                        <SelectItem key={role} value={role}>
+                          {role}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
               <DialogFooter>

@@ -6,6 +6,7 @@ interface RequestBody {
   email?: string;
   password?: string;
   full_name?: string;
+  role?: string;
   user_id?: string;
   roles?: string[];
 }
@@ -85,6 +86,21 @@ Deno.serve(async (req) => {
             status: 400,
             headers: { ...corsHeaders, 'Content-Type': 'application/json' },
           });
+        }
+
+        // If a specific role is provided, update the default role
+        if (body.role && newUser.user) {
+          // Delete the default 'parent' role inserted by trigger
+          await supabaseAdmin.from('user_roles').delete().eq('user_id', newUser.user.id);
+          
+          // Insert the chosen role
+          const { error: roleError } = await supabaseAdmin
+            .from('user_roles')
+            .insert({ user_id: newUser.user.id, role: body.role });
+
+          if (roleError) {
+            console.error('Error setting role:', roleError);
+          }
         }
 
         return new Response(JSON.stringify({ success: true, user: newUser }), {
