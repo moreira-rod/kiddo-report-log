@@ -180,6 +180,7 @@ export type Database = {
           created_by: string
           id: string
           name: string
+          teacher_id: string | null
         }
         Insert: {
           class_id?: string | null
@@ -188,6 +189,7 @@ export type Database = {
           created_by: string
           id?: string
           name: string
+          teacher_id?: string | null
         }
         Update: {
           class_id?: string | null
@@ -196,6 +198,7 @@ export type Database = {
           created_by?: string
           id?: string
           name?: string
+          teacher_id?: string | null
         }
         Relationships: [
           {

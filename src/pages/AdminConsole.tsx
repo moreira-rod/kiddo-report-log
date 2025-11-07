@@ -72,11 +72,47 @@ const AdminConsole = () => {
     try {
       setLoading(true);
 
-      // Fetch all profiles
-      const { data: profiles, error: profilesError } = await supabase
+      const { data: { user: currentUser } } = await supabase.auth.getUser();
+      if (!currentUser) return;
+
+      // Get current user's roles
+      const { data: currentUserRoles } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", currentUser.id);
+
+      const roles = currentUserRoles?.map(r => r.role) || [];
+      const isAdminUser = roles.includes("admin");
+      const isDirector = roles.includes("director");
+      const isCoordinator = roles.includes("coordinator");
+
+      let profilesQuery = supabase
         .from("profiles")
         .select("*")
         .order("email");
+
+      // Filter profiles based on hierarchy
+      if (!isAdminUser) {
+        if (isCoordinator && !isDirector) {
+          // Coordinators see only users they manage
+          profilesQuery = profilesQuery.or(`managed_by.eq.${currentUser.id},id.eq.${currentUser.id}`);
+        } else if (isDirector) {
+          // Directors see coordinators they manage and teachers under those coordinators
+          const { data: managedCoordinators } = await supabase
+            .from("profiles")
+            .select("id")
+            .eq("managed_by", currentUser.id);
+
+          const coordinatorIds = managedCoordinators?.map(c => c.id) || [];
+          const managedByClause = coordinatorIds.length > 0 
+            ? [currentUser.id, ...coordinatorIds]
+            : [currentUser.id];
+          
+          profilesQuery = profilesQuery.or(`managed_by.in.(${managedByClause.join(",")}),id.eq.${currentUser.id}`);
+        }
+      }
+
+      const { data: profiles, error: profilesError } = await profilesQuery;
 
       if (profilesError) throw profilesError;
 
