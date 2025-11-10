@@ -3,11 +3,19 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Plus, LogOut, Users, FileText, BookOpen, Shield } from "lucide-react";
+import { Plus, LogOut, Users, FileText, BookOpen, Shield, MoreVertical } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
 import StudentCard from "@/components/StudentCard";
 import AddStudentDialog from "@/components/AddStudentDialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface Student {
   id: string;
@@ -79,29 +87,40 @@ const Students = () => {
               </p>
             </div>
           </div>
-          <div className="flex gap-2">
-            {isAdmin && (
-              <Button
-                variant="outline"
-                onClick={() => navigate("/admin")}
-                className="hidden sm:inline-flex"
-              >
-                <Shield className="w-4 h-4 mr-2" />
-                Admin
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" className="gap-2">
+                <MoreVertical className="w-4 h-4" />
+                Opções
               </Button>
-            )}
-            <Button
-              variant="outline"
-              onClick={() => navigate("/classes")}
-              className="hidden sm:inline-flex"
-            >
-              <BookOpen className="w-4 h-4 mr-2" />
-              Turmas
-            </Button>
-            <Button variant="ghost" size="icon" onClick={handleLogout}>
-              <LogOut className="w-5 h-5" />
-            </Button>
-          </div>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-56 bg-card z-50">
+              <DropdownMenuLabel className="font-normal">
+                <div className="flex flex-col space-y-1">
+                  <p className="text-sm font-medium leading-none">{profile?.full_name || "Usuário"}</p>
+                  <p className="text-xs leading-none text-muted-foreground">
+                    {profile?.email || user?.email}
+                  </p>
+                </div>
+              </DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              {isAdmin && (
+                <DropdownMenuItem onClick={() => navigate("/admin")}>
+                  <Shield className="w-4 h-4 mr-2" />
+                  Admin
+                </DropdownMenuItem>
+              )}
+              <DropdownMenuItem onClick={() => navigate("/classes")}>
+                <BookOpen className="w-4 h-4 mr-2" />
+                Turmas
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={handleLogout}>
+                <LogOut className="w-4 h-4 mr-2" />
+                Sair
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </header>
 
