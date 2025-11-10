@@ -90,8 +90,13 @@ const Students = () => {
                 Admin
               </Button>
             )}
-            <Button variant="ghost" size="icon" onClick={() => navigate("/classes")}>
-              <BookOpen className="w-5 h-5" />
+            <Button
+              variant="outline"
+              onClick={() => navigate("/classes")}
+              className="hidden sm:inline-flex"
+            >
+              <BookOpen className="w-4 h-4 mr-2" />
+              Turmas
             </Button>
             <Button variant="ghost" size="icon" onClick={handleLogout}>
               <LogOut className="w-5 h-5" />
