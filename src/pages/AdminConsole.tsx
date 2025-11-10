@@ -31,7 +31,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ArrowLeft, Plus, Trash2, Edit, Shield } from "lucide-react";
+import { ArrowLeft, Plus, Trash2, Edit, Shield, Network } from "lucide-react";
 import { toast } from "sonner";
 
 interface UserData {
@@ -260,14 +260,19 @@ const AdminConsole = () => {
               <h1 className="text-3xl font-bold text-foreground">Console de Administração</h1>
             </div>
           </div>
-          <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
-            <DialogTrigger asChild>
-              <Button>
-                <Plus className="w-4 h-4 mr-2" />
-                Criar Usuário
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={() => navigate("/admin/hierarchy")}>
+              <Network className="w-4 h-4 mr-2" />
+              Hierarquia
+            </Button>
+            <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
+              <DialogTrigger asChild>
+                <Button>
+                  <Plus className="w-4 h-4 mr-2" />
+                  Criar Usuário
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
               <DialogHeader>
                 <DialogTitle>Criar Novo Usuário</DialogTitle>
                 <DialogDescription>
@@ -328,6 +333,7 @@ const AdminConsole = () => {
               </DialogFooter>
             </DialogContent>
           </Dialog>
+          </div>
         </div>
 
         <Card className="p-6">
