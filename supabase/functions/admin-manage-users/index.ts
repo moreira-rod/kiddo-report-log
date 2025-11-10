@@ -22,9 +22,15 @@ Deno.serve(async (req) => {
     const authHeader = req.headers.get('Authorization')!;
 
     // Client for checking permissions
+    const supabaseAnonKey = Deno.env.get('SUPABASE_PUBLISHABLE_KEY') ?? Deno.env.get('SUPABASE_ANON_KEY')!;
     const supabaseClient = createClient(
       supabaseUrl,
-      authHeader.replace('Bearer ', ''),
+      supabaseAnonKey,
+      {
+        global: {
+          headers: { Authorization: authHeader },
+        },
+      }
     );
 
     // Admin client for operations
