@@ -88,10 +88,17 @@ Deno.serve(async (req) => {
           });
         }
 
-        // If a specific role is provided, update the default role
-        if (body.role && newUser.user) {
+        // If a specific role is provided and it's different from 'parent', update the role
+        if (body.role && newUser.user && body.role !== 'parent') {
           // Delete the default 'parent' role inserted by trigger
-          await supabaseAdmin.from('user_roles').delete().eq('user_id', newUser.user.id);
+          const { error: deleteError } = await supabaseAdmin
+            .from('user_roles')
+            .delete()
+            .eq('user_id', newUser.user.id);
+
+          if (deleteError) {
+            console.error('Error deleting default role:', deleteError);
+          }
           
           // Insert the chosen role
           const { error: roleError } = await supabaseAdmin
@@ -100,6 +107,10 @@ Deno.serve(async (req) => {
 
           if (roleError) {
             console.error('Error setting role:', roleError);
+            return new Response(JSON.stringify({ error: 'Failed to set user role: ' + roleError.message }), {
+              status: 500,
+              headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+            });
           }
         }
 
