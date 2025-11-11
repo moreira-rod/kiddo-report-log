@@ -370,12 +370,12 @@ const AdminConsole = () => {
                 {newRole === "teacher" && coordinators.length > 0 && (
                   <div>
                     <Label htmlFor="coordinator">Coordenador (opcional)</Label>
-                    <Select value={newManagedBy} onValueChange={setNewManagedBy}>
+                    <Select value={newManagedBy || "none"} onValueChange={(val) => setNewManagedBy(val === "none" ? "" : val)}>
                       <SelectTrigger id="coordinator">
                         <SelectValue placeholder="Selecione um coordenador" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="">Nenhum</SelectItem>
+                        <SelectItem value="none">Nenhum</SelectItem>
                         {coordinators.map((coord) => (
                           <SelectItem key={coord.id} value={coord.id}>
                             {coord.full_name || coord.email}
@@ -479,12 +479,12 @@ const AdminConsole = () => {
               {editRoles.includes("teacher") && coordinators.length > 0 && (
                 <div>
                   <Label htmlFor="edit-coordinator">Coordenador</Label>
-                  <Select value={editManagedBy} onValueChange={setEditManagedBy}>
+                  <Select value={editManagedBy || "none"} onValueChange={(val) => setEditManagedBy(val === "none" ? "" : val)}>
                     <SelectTrigger id="edit-coordinator">
                       <SelectValue placeholder="Selecione um coordenador" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">Nenhum</SelectItem>
+                      <SelectItem value="none">Nenhum</SelectItem>
                       {coordinators.map((coord) => (
                         <SelectItem key={coord.id} value={coord.id}>
                           {coord.full_name || coord.email}
