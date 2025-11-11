@@ -39,6 +39,13 @@ interface UserData {
   email: string;
   full_name: string | null;
   roles: string[];
+  managed_by: string | null;
+}
+
+interface CoordinatorOption {
+  id: string;
+  full_name: string | null;
+  email: string;
 }
 
 const AVAILABLE_ROLES = ["admin", "teacher", "parent", "director", "coordinator", "student"];
@@ -51,15 +58,18 @@ const AdminConsole = () => {
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<UserData | null>(null);
+  const [coordinators, setCoordinators] = useState<CoordinatorOption[]>([]);
   
   // Create user form
   const [newEmail, setNewEmail] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [newFullName, setNewFullName] = useState("");
   const [newRole, setNewRole] = useState("parent");
+  const [newManagedBy, setNewManagedBy] = useState<string>("");
   
   // Edit roles form
   const [editRoles, setEditRoles] = useState<string[]>([]);
+  const [editManagedBy, setEditManagedBy] = useState<string>("");
 
   useEffect(() => {
     if (!authLoading) {
@@ -73,8 +83,36 @@ const AdminConsole = () => {
         return;
       }
       fetchUsers();
+      fetchCoordinators();
     }
   }, [user, authLoading, isAdmin, navigate]);
+
+  const fetchCoordinators = async () => {
+    try {
+      // Get all coordinators
+      const { data: coordinatorRoles } = await supabase
+        .from("user_roles")
+        .select("user_id")
+        .eq("role", "coordinator");
+
+      const coordinatorIds = coordinatorRoles?.map(r => r.user_id) || [];
+
+      if (coordinatorIds.length === 0) {
+        setCoordinators([]);
+        return;
+      }
+
+      // Get coordinator profiles
+      const { data: coordinatorProfiles } = await supabase
+        .from("profiles")
+        .select("id, email, full_name")
+        .in("id", coordinatorIds);
+
+      setCoordinators(coordinatorProfiles || []);
+    } catch (error: any) {
+      console.error("Error fetching coordinators:", error);
+    }
+  };
 
   const fetchUsers = async () => {
     try {
@@ -137,6 +175,7 @@ const AdminConsole = () => {
         email: profile.email,
         full_name: profile.full_name,
         roles: rolesData?.filter((r) => r.user_id === profile.id).map((r) => r.role) || [],
+        managed_by: profile.managed_by,
       }));
 
       setUsers(usersWithRoles);
@@ -162,6 +201,7 @@ const AdminConsole = () => {
           password: newPassword,
           full_name: newFullName,
           role: newRole,
+          managed_by: newManagedBy || null,
         },
       });
 
@@ -173,6 +213,7 @@ const AdminConsole = () => {
       setNewPassword("");
       setNewFullName("");
       setNewRole("parent");
+      setNewManagedBy("");
       fetchUsers();
     } catch (error: any) {
       console.error("Error:", error);
@@ -206,6 +247,7 @@ const AdminConsole = () => {
   const handleOpenEditRoles = (userData: UserData) => {
     setSelectedUser(userData);
     setEditRoles(userData.roles);
+    setEditManagedBy(userData.managed_by || "");
     setEditDialogOpen(true);
   };
 
@@ -218,6 +260,7 @@ const AdminConsole = () => {
           action: "update_roles",
           user_id: selectedUser.id,
           roles: editRoles,
+          managed_by: editManagedBy || null,
         },
       });
 
@@ -324,6 +367,24 @@ const AdminConsole = () => {
                     </SelectContent>
                   </Select>
                 </div>
+                {newRole === "teacher" && coordinators.length > 0 && (
+                  <div>
+                    <Label htmlFor="coordinator">Coordenador (opcional)</Label>
+                    <Select value={newManagedBy} onValueChange={setNewManagedBy}>
+                      <SelectTrigger id="coordinator">
+                        <SelectValue placeholder="Selecione um coordenador" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="">Nenhum</SelectItem>
+                        {coordinators.map((coord) => (
+                          <SelectItem key={coord.id} value={coord.id}>
+                            {coord.full_name || coord.email}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
               </div>
               <DialogFooter>
                 <Button variant="outline" onClick={() => setCreateDialogOpen(false)}>
@@ -415,6 +476,24 @@ const AdminConsole = () => {
                   </Label>
                 </div>
               ))}
+              {editRoles.includes("teacher") && coordinators.length > 0 && (
+                <div>
+                  <Label htmlFor="edit-coordinator">Coordenador</Label>
+                  <Select value={editManagedBy} onValueChange={setEditManagedBy}>
+                    <SelectTrigger id="edit-coordinator">
+                      <SelectValue placeholder="Selecione um coordenador" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="">Nenhum</SelectItem>
+                      {coordinators.map((coord) => (
+                        <SelectItem key={coord.id} value={coord.id}>
+                          {coord.full_name || coord.email}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
             </div>
             <DialogFooter>
               <Button variant="outline" onClick={() => setEditDialogOpen(false)}>

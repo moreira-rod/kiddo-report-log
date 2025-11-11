@@ -9,6 +9,7 @@ interface RequestBody {
   role?: string;
   user_id?: string;
   roles?: string[];
+  managed_by?: string | null;
 }
 
 Deno.serve(async (req) => {
@@ -120,6 +121,18 @@ Deno.serve(async (req) => {
           }
         }
 
+        // Update managed_by if provided
+        if (body.managed_by && newUser.user) {
+          const { error: updateError } = await supabaseAdmin
+            .from('profiles')
+            .update({ managed_by: body.managed_by })
+            .eq('id', newUser.user.id);
+
+          if (updateError) {
+            console.error('Error updating managed_by:', updateError);
+          }
+        }
+
         return new Response(JSON.stringify({ success: true, user: newUser }), {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         });
@@ -174,6 +187,18 @@ Deno.serve(async (req) => {
             status: 400,
             headers: { ...corsHeaders, 'Content-Type': 'application/json' },
           });
+        }
+
+        // Update managed_by if provided
+        if (body.managed_by !== undefined) {
+          const { error: updateError } = await supabaseAdmin
+            .from('profiles')
+            .update({ managed_by: body.managed_by })
+            .eq('id', body.user_id);
+
+          if (updateError) {
+            console.error('Error updating managed_by:', updateError);
+          }
         }
 
         return new Response(JSON.stringify({ success: true }), {
