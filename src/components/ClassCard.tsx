@@ -1,6 +1,6 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { BookOpen, Users, Pencil, Trash2 } from "lucide-react";
+import { BookOpen, Users, Pencil, Trash2, GraduationCap } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 interface ClassCardProps {
@@ -9,6 +9,7 @@ interface ClassCardProps {
     name: string;
     description: string | null;
     school_year: string | null;
+    teacher_name?: string | null;
   };
   studentCount: number;
   onEdit?: () => void;
@@ -31,6 +32,12 @@ const ClassCard = ({ classData, studentCount, onEdit, onDelete }: ClassCardProps
           )}
           {classData.school_year && (
             <p className="text-xs text-muted-foreground mt-1">Ano: {classData.school_year}</p>
+          )}
+          {classData.teacher_name && (
+            <div className="flex items-center gap-2 mt-2">
+              <GraduationCap className="w-4 h-4 text-primary" />
+              <span className="text-sm text-foreground font-medium">{classData.teacher_name}</span>
+            </div>
           )}
           <div className="flex items-center gap-2 mt-2">
             <Users className="w-4 h-4 text-muted-foreground" />

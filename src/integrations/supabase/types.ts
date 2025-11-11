@@ -23,6 +23,7 @@ export type Database = {
           managed_by: string | null
           name: string
           school_year: string | null
+          teacher_id: string | null
           updated_at: string
         }
         Insert: {
@@ -33,6 +34,7 @@ export type Database = {
           managed_by?: string | null
           name: string
           school_year?: string | null
+          teacher_id?: string | null
           updated_at?: string
         }
         Update: {
@@ -43,6 +45,7 @@ export type Database = {
           managed_by?: string | null
           name?: string
           school_year?: string | null
+          teacher_id?: string | null
           updated_at?: string
         }
         Relationships: [

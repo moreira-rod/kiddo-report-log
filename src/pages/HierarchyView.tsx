@@ -25,6 +25,7 @@ interface Class {
   id: string;
   name: string;
   studentsCount: number;
+  teacherName?: string | null;
 }
 
 const HierarchyView = () => {
@@ -83,7 +84,7 @@ const HierarchyView = () => {
       const { data: classes } = await supabase
         .from("classes")
         .select("*")
-        .or(`created_by.in.(${teacherIds.join(",")}),managed_by.in.(${teacherIds.join(",")})`);
+        .or(`created_by.in.(${teacherIds.join(",")}),managed_by.in.(${teacherIds.join(",")}),teacher_id.in.(${teacherIds.join(",")})`);
 
       // Get student counts for each class
       const classIds = classes?.map(c => c.id) || [];
@@ -98,11 +99,12 @@ const HierarchyView = () => {
           .filter(t => t.managed_by === coord.id)
           .map(teacher => {
             const teacherClasses = (classes || [])
-              .filter(c => c.created_by === teacher.id || c.managed_by === teacher.id)
+              .filter(c => c.created_by === teacher.id || c.managed_by === teacher.id || c.teacher_id === teacher.id)
               .map(cls => ({
                 id: cls.id,
                 name: cls.name,
-                studentsCount: (students || []).filter(s => s.class_id === cls.id).length
+                studentsCount: (students || []).filter(s => s.class_id === cls.id).length,
+                teacherName: teacher.full_name || teacher.email
               }));
 
             return {

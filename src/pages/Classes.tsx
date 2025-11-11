@@ -24,6 +24,8 @@ interface Class {
   name: string;
   description: string | null;
   school_year: string | null;
+  teacher_id: string | null;
+  teacher_name?: string | null;
 }
 
 const Classes = () => {
@@ -54,13 +56,33 @@ const Classes = () => {
         .order("name");
 
       if (error) throw error;
-      setClasses(data || []);
+
+      // Fetch teacher names for each class
+      const classesWithTeachers = await Promise.all(
+        (data || []).map(async (cls) => {
+          if (cls.teacher_id) {
+            const { data: teacherProfile } = await supabase
+              .from("profiles")
+              .select("full_name, email")
+              .eq("id", cls.teacher_id)
+              .maybeSingle();
+            
+            return {
+              ...cls,
+              teacher_name: teacherProfile?.full_name || teacherProfile?.email || null
+            };
+          }
+          return { ...cls, teacher_name: null };
+        })
+      );
+
+      setClasses(classesWithTeachers);
 
       // Fetch student counts for each class
-      if (data && data.length > 0) {
+      if (classesWithTeachers && classesWithTeachers.length > 0) {
         const counts: Record<string, number> = {};
         await Promise.all(
-          data.map(async (cls) => {
+          classesWithTeachers.map(async (cls) => {
             const { count } = await supabase
               .from("students")
               .select("*", { count: "exact", head: true })

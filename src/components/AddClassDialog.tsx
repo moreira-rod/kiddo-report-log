@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import {
@@ -10,7 +10,20 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { toast } from "sonner";
+
+interface Teacher {
+  id: string;
+  full_name: string | null;
+  email: string;
+}
 
 interface AddClassDialogProps {
   open: boolean;
@@ -22,7 +35,42 @@ const AddClassDialog = ({ open, onOpenChange, onSuccess }: AddClassDialogProps) 
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [schoolYear, setSchoolYear] = useState("");
+  const [teacherId, setTeacherId] = useState<string>("");
+  const [teachers, setTeachers] = useState<Teacher[]>([]);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (open) {
+      fetchTeachers();
+    }
+  }, [open]);
+
+  const fetchTeachers = async () => {
+    try {
+      // Get all teachers
+      const { data: teacherRoles } = await supabase
+        .from("user_roles")
+        .select("user_id")
+        .eq("role", "teacher");
+
+      const teacherIds = teacherRoles?.map(r => r.user_id) || [];
+
+      if (teacherIds.length === 0) {
+        setTeachers([]);
+        return;
+      }
+
+      // Get teacher profiles
+      const { data: teacherProfiles } = await supabase
+        .from("profiles")
+        .select("id, email, full_name")
+        .in("id", teacherIds);
+
+      setTeachers(teacherProfiles || []);
+    } catch (error: any) {
+      console.error("Error fetching teachers:", error);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -46,6 +94,7 @@ const AddClassDialog = ({ open, onOpenChange, onSuccess }: AddClassDialogProps) 
         name: name.trim(),
         description: description.trim() || null,
         school_year: schoolYear.trim() || null,
+        teacher_id: teacherId || null,
         created_by: user.id,
       });
 
@@ -55,6 +104,7 @@ const AddClassDialog = ({ open, onOpenChange, onSuccess }: AddClassDialogProps) 
       setName("");
       setDescription("");
       setSchoolYear("");
+      setTeacherId("");
       onOpenChange(false);
       onSuccess();
     } catch (error: any) {
@@ -103,7 +153,28 @@ const AddClassDialog = ({ open, onOpenChange, onSuccess }: AddClassDialogProps) 
               maxLength={20}
             />
           </div>
-          <Button type="submit" disabled={loading} className="w-full">
+          <div>
+            <Label htmlFor="teacher">Professor Responsável *</Label>
+            <Select value={teacherId} onValueChange={setTeacherId} required>
+              <SelectTrigger id="teacher">
+                <SelectValue placeholder="Selecione um professor" />
+              </SelectTrigger>
+              <SelectContent>
+                {teachers.length === 0 ? (
+                  <SelectItem value="none" disabled>
+                    Nenhum professor cadastrado
+                  </SelectItem>
+                ) : (
+                  teachers.map((teacher) => (
+                    <SelectItem key={teacher.id} value={teacher.id}>
+                      {teacher.full_name || teacher.email}
+                    </SelectItem>
+                  ))
+                )}
+              </SelectContent>
+            </Select>
+          </div>
+          <Button type="submit" disabled={loading || !teacherId} className="w-full">
             {loading ? "Criando..." : "Criar Turma"}
           </Button>
         </form>
