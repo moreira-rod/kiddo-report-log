@@ -148,7 +148,7 @@ const Classes = () => {
               <BookOpen className="w-5 h-5 text-white" />
             </div>
             <div>
-              <h1 className="text-xl font-bold text-foreground">Turmas</h1>
+              <h1 className="text-xl font-bold text-foreground">Gestão de Turmas</h1>
               <p className="text-sm text-muted-foreground">
                 {profile?.full_name || profile?.email || "Usuário"} • {classes.length} turmas
               </p>

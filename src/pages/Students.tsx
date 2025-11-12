@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Plus, LogOut, Users, FileText, BookOpen, Shield, MoreVertical } from "lucide-react";
+import { Plus, LogOut, Users, FileText, BookOpen, Shield, MoreVertical, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
 import StudentCard from "@/components/StudentCard";
@@ -77,11 +77,19 @@ const Students = () => {
       <header className="bg-card shadow-soft sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => navigate("/")}
+              className="mr-2"
+            >
+              <ArrowLeft className="w-5 h-5" />
+            </Button>
             <div className="w-10 h-10 rounded-full bg-gradient-primary flex items-center justify-center">
               <Users className="w-5 h-5 text-white" />
             </div>
             <div>
-              <h1 className="text-xl font-bold text-foreground">Meus Alunos</h1>
+              <h1 className="text-xl font-bold text-foreground">Gestão de Alunos</h1>
               <p className="text-sm text-muted-foreground">
                 {profile?.full_name || profile?.email || "Usuário"} • {students.length} alunos
               </p>

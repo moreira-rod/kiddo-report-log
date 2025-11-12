@@ -25,6 +25,12 @@ interface Teacher {
   email: string;
 }
 
+interface Coordinator {
+  id: string;
+  full_name: string | null;
+  email: string;
+}
+
 interface AddClassDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -36,12 +42,15 @@ const AddClassDialog = ({ open, onOpenChange, onSuccess }: AddClassDialogProps) 
   const [description, setDescription] = useState("");
   const [schoolYear, setSchoolYear] = useState("");
   const [teacherId, setTeacherId] = useState<string>("");
+  const [coordinatorId, setCoordinatorId] = useState<string>("");
   const [teachers, setTeachers] = useState<Teacher[]>([]);
+  const [coordinators, setCoordinators] = useState<Coordinator[]>([]);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (open) {
       fetchTeachers();
+      fetchCoordinators();
     }
   }, [open]);
 
@@ -72,6 +81,33 @@ const AddClassDialog = ({ open, onOpenChange, onSuccess }: AddClassDialogProps) 
     }
   };
 
+  const fetchCoordinators = async () => {
+    try {
+      // Get all coordinators
+      const { data: coordinatorRoles } = await supabase
+        .from("user_roles")
+        .select("user_id")
+        .eq("role", "coordinator");
+
+      const coordinatorIds = coordinatorRoles?.map(r => r.user_id) || [];
+
+      if (coordinatorIds.length === 0) {
+        setCoordinators([]);
+        return;
+      }
+
+      // Get coordinator profiles
+      const { data: coordinatorProfiles } = await supabase
+        .from("profiles")
+        .select("id, email, full_name")
+        .in("id", coordinatorIds);
+
+      setCoordinators(coordinatorProfiles || []);
+    } catch (error: any) {
+      console.error("Error fetching coordinators:", error);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -95,6 +131,7 @@ const AddClassDialog = ({ open, onOpenChange, onSuccess }: AddClassDialogProps) 
         description: description.trim() || null,
         school_year: schoolYear.trim() || null,
         teacher_id: teacherId || null,
+        coordinator_id: coordinatorId || null,
         created_by: user.id,
       });
 
@@ -105,6 +142,7 @@ const AddClassDialog = ({ open, onOpenChange, onSuccess }: AddClassDialogProps) 
       setDescription("");
       setSchoolYear("");
       setTeacherId("");
+      setCoordinatorId("");
       onOpenChange(false);
       onSuccess();
     } catch (error: any) {
@@ -152,6 +190,27 @@ const AddClassDialog = ({ open, onOpenChange, onSuccess }: AddClassDialogProps) 
               placeholder="Ex: 2025"
               maxLength={20}
             />
+          </div>
+          <div>
+            <Label htmlFor="coordinator">Coordenador Responsável</Label>
+            <Select value={coordinatorId} onValueChange={setCoordinatorId}>
+              <SelectTrigger id="coordinator">
+                <SelectValue placeholder="Selecione um coordenador (opcional)" />
+              </SelectTrigger>
+              <SelectContent>
+                {coordinators.length === 0 ? (
+                  <SelectItem value="none" disabled>
+                    Nenhum coordenador cadastrado
+                  </SelectItem>
+                ) : (
+                  coordinators.map((coordinator) => (
+                    <SelectItem key={coordinator.id} value={coordinator.id}>
+                      {coordinator.full_name || coordinator.email}
+                    </SelectItem>
+                  ))
+                )}
+              </SelectContent>
+            </Select>
           </div>
           <div>
             <Label htmlFor="teacher">Professor Responsável *</Label>

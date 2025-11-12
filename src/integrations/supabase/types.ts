@@ -16,6 +16,7 @@ export type Database = {
     Tables: {
       classes: {
         Row: {
+          coordinator_id: string | null
           created_at: string
           created_by: string
           description: string | null
@@ -27,6 +28,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          coordinator_id?: string | null
           created_at?: string
           created_by: string
           description?: string | null
@@ -38,6 +40,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          coordinator_id?: string | null
           created_at?: string
           created_by?: string
           description?: string | null
