@@ -104,16 +104,23 @@ const Students = () => {
                 </div>
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
-              {isAdmin && (
-                <DropdownMenuItem onClick={() => navigate("/admin")}>
-                  <Shield className="w-4 h-4 mr-2" />
-                  Admin
-                </DropdownMenuItem>
-              )}
+              <DropdownMenuItem onClick={() => navigate("/")}>
+                <BookOpen className="w-4 h-4 mr-2" />
+                Início
+              </DropdownMenuItem>
               <DropdownMenuItem onClick={() => navigate("/classes")}>
                 <BookOpen className="w-4 h-4 mr-2" />
                 Turmas
               </DropdownMenuItem>
+              {isAdmin && (
+                <>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={() => navigate("/admin")}>
+                    <Shield className="w-4 h-4 mr-2" />
+                    Admin
+                  </DropdownMenuItem>
+                </>
+              )}
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={handleLogout}>
                 <LogOut className="w-4 h-4 mr-2" />
